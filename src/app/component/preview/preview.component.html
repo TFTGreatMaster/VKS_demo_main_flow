@@ -1,0 +1,17 @@
+<h2 style="color: green">GeeksforGeeks</h2>
+<h3>Angular PrimeNG Image Preview</h3>
+
+<p-image
+  src="https://media.geeksforgeeks.org/wp-content/uploads/20220408213837/gfg200x200min.png"
+  [preview]="true"
+  alt="logo">
+</p-image>
+`
+<button (click)="showVideoDialog()">Xem trước video</button>
+
+<p-dialog [(visible)]="displayVideoDialog" [modal]="true" [style]="{width: '60%'}">
+  <video controls>
+    <source src="{{videoUrl}}" type="video/mp4">
+  </video>
+</p-dialog>
+`

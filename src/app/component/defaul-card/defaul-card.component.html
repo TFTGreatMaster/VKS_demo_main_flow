@@ -1,0 +1,45 @@
+<p-card [subheader]="showName()" [style]="{ width: '260px', margin: '10px' }">
+  <div class="card-content" *ngIf="props.type === 'folder'"
+  >
+    <span (click)="onClickCard({documentId: props.id, documentName: props.name})">{{ props.name }}</span>
+    <div>
+      <i class="pi pi-cog" style="font-size: 1.5rem; padding-right:8px;"
+         (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
+      <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem; padding-right:8px;"
+         (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
+      <i class="pi pi-trash" style="font-size: 1.5rem"
+         (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
+    </div>
+  </div>
+  <ng-template pTemplate="header" *ngIf="props.type === 'file'">
+    <img alt="Card" [src]="props.url"/>
+  </ng-template>
+  <ng-template pTemplate="footer" *ngIf="props.type === 'file'">
+    <div class="card-footer">
+      <i class="pi pi-cog" style="font-size: 1.5rem"
+         (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
+      <p-divider layout="vertical"/>
+      <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem"
+         (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
+      <p-divider layout="vertical"/>
+      <i class="pi pi-trash" style="font-size: 1.5rem"
+         (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
+    </div>
+  </ng-template>
+</p-card>
+<p-dialog [header]="'Delete ' + selectItem.type +' '+ selectItem.name" [modal]="true" [(visible)]="isDeleteModal">
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" [text]="true" severity="secondary" (click)="onCancelModal()"/>
+    <p-button label="Delete" [outlined]="true" severity="danger" (click)="onDeleteConfirm()"/>
+  </ng-template>
+</p-dialog>
+<p-dialog [header]="'Update ' + selectItem.type" [modal]="true" [(visible)]="isUpdateModal">
+  <div class="flex align-items-center gap-3 mb-3">
+    <label for="name" class="font-semibold w-6rem">Name</label>
+    <input pInputText class="flex-auto" autocomplete="off" [(ngModel)]="selectItem.name"/>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" [text]="true" severity="secondary" (click)="onCancelModal()"/>
+    <p-button label="Update" severity="success" (click)="onUpdateConfirm()"/>
+  </ng-template>
+</p-dialog>

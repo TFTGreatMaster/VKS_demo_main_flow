@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="home-container">
+    <div>
+      <app-bread-crumb
+        [items]="breadCrumb.items"
+        [home]="breadCrumb.home"
+        (onClickItem)="handleClickBreadCrumd($event)"
+      ></app-bread-crumb>
+    </div>
+    <div class="home-header">
+      <p-button label="Add Folder" icon="pi pi-folder-plus" iconPos="right" (onClick)="onShowCreateModal()"/>
+      <p-button label="Upload File" icon="pi pi-file-plus" iconPos="right" [style]="{'margin': '20px' }"/>
+      <p-fileUpload
+        mode="basic"
+        chooseLabel="Choose" chooseIcon="pi pi-upload"
+        url="https://www.primefaces.org/cdn/api/upload.php" maxFileSize="100000000"
+        [auto]="true"
+        (onUpload)="onUpload($event)"/>
+    </div>
+    <p-divider align="left" class="home-divider">
+      <b>Folder</b>
+    </p-divider>
+    <div class="card-container">
+      <app-defaul-card
+        *ngFor="let item of folderData"
+        [props]="item"
+        (onClickItem)="handleGetDocuments($event)"
+        (onDeleteItem)="onDeleteItem($event)"
+        (onUpdateItem)="onUpdateItem($event)"
+      ></app-defaul-card>
+    </div>
+    <p-divider align="left" class="home-divider">
+      <b>File</b>
+    </p-divider>
+    <div class="card-container">
+      <app-defaul-card
+        *ngFor="let item of fileData"
+        [props]="item"
+        (onDeleteItem)="onDeleteItem($event)"
+        (onUpdateItem)="onUpdateItem($event)"
+      ></app-defaul-card>
+    </div>
+  </div>
+  <p-dialog header="Create File" [modal]="true" [(visible)]="isCreateModal" [style]="{ width: '25rem' }">
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="createFile" class="font-semibold w-6rem">Name</label>
+      <input pInputText id="createFile" class="flex-auto" autocomplete="off" [(ngModel)]="folderCreate.name"/>
+    </div>
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Cancel" severity="secondary" (click)="onCancelModal()"/>
+      <p-button label="Create" (click)="onCreateConfirm()"/>
+    </div>
+  </p-dialog>
+  <video width="640" height="480" controls>
+    <source src="http://192.168.1.50:8082/document/uploads/1716193695131_Demo_UI_Flow.mov"/>
+  </video>
+  <app-move></app-move>
+</div>
