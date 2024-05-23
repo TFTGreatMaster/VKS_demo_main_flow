@@ -1,4 +1,9 @@
 export interface ILogin {
-  userName: string,
-  passWord: string
+  username: string,
+  password: string
+}
+
+export interface IResLogin {
+  message: string,
+  token: string
 }

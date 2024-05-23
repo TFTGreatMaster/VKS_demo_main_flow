@@ -12,7 +12,11 @@
     </div>
   </div>
   <ng-template pTemplate="header" *ngIf="props.type === 'file'">
-    <img alt="Card" [src]="props.url"/>
+    <p-image
+      [src]="props.url"
+      alt="Image"
+      width="250"
+      [preview]="true" />
   </ng-template>
   <ng-template pTemplate="footer" *ngIf="props.type === 'file'">
     <div class="card-footer">

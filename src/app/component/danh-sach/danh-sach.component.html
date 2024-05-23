@@ -11,7 +11,8 @@
           <ng-template pTemplate="header">
             <tr>
               <th>id</th>
-              <th>Name</th>
+              <th>Tên vụ án</th>
+              <th>Mô tả</th>
               <th style="width: 5rem">Hành động</th>
             </tr>
           </ng-template>
@@ -19,6 +20,7 @@
             <tr>
               <td>{{ vuAn.id }}</td>
               <td>{{ vuAn.name }}</td>
+              <td>{{ vuAn.description }}</td>
               <td style="display: flex">
                 <button
                   type="button"
@@ -62,6 +64,11 @@
       <label for="createName" class="font-semibold w-6rem">Tên vụ án</label>
       <input pInputText id="createName" class="flex-auto" [(ngModel)]="createVuAn.name" autocomplete="off"/>
     </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="createDescription" class="font-semibold w-6rem">Mô tả</label>
+      <input pInputText id="createDescription" class="flex-auto" [(ngModel)]="createVuAn.description"
+             autocomplete="off"/>
+    </div>
     <div class="flex justify-content-end gap-2">
       <p-button label="Hủy" severity="secondary" (click)="visibleCreateModal = false"/>
       <p-button label="Thêm" (click)="onConfirmCreateVuAn()"/>
@@ -69,8 +76,13 @@
   </p-dialog>
   <p-dialog header="Chỉnh sửa vụ án" [(visible)]="visibleUpdateModal" [style]="{ width: '25rem' }">
     <div class="flex align-items-center gap-3 mb-3">
-      <label for="updateName" class="font-semibold w-6rem">Name</label>
+      <label for="updateName" class="font-semibold w-6rem">Tên vụ án</label>
       <input pInputText id="updateName" class="flex-auto" [(ngModel)]="updateVuAn.name" autocomplete="off"/>
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+      <label for="updateDescription" class="font-semibold w-6rem">Mô tả</label>
+      <input pInputText id="updateDescription" class="flex-auto" [(ngModel)]="updateVuAn.description"
+             autocomplete="off"/>
     </div>
     <div class="flex justify-content-end gap-2">
       <p-button label="Hủy" severity="secondary" (click)="visibleUpdateModal = false"/>

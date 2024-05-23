@@ -13,6 +13,7 @@ import {InputTextModule} from "primeng/inputtext";
 import {IVuAn} from "../../interface/vu-an/vu-an";
 import {VuAnService} from '../../service'
 import {TaiLieuService} from "../../service/tai-lieu/tai-lieu.service";
+import {DetailVuAnService} from "../../service/detail-vu-an/detail-vu-an.service";
 
 @Component({
   selector: 'app-danh-sach',
@@ -38,16 +39,17 @@ export class DanhSachComponent implements OnInit {
   visibleUpdateModal: boolean = false;
   visibleDeleteModal: boolean = false;
 
-  createVuAn: Omit<IVuAn, 'id'> = {name: ''}
+  createVuAn: Omit<IVuAn, 'id'> = {name: '', description: ''}
 
   updateVuAn: IVuAn = {
     id: 0,
-    name: ''
+    name: '',
+    description: '',
   }
 
-  deleteVuAn: IVuAn = {
+  deleteVuAn: Omit<IVuAn, 'description'> = {
     id: 0,
-    name: ''
+    name: '',
   }
 
   onShowCreate() {
@@ -57,6 +59,7 @@ export class DanhSachComponent implements OnInit {
   onShowUpdateVuan(vuAn: IVuAn) {
     this.updateVuAn.id = vuAn.id
     this.updateVuAn.name = vuAn.name
+    this.updateVuAn.description = vuAn.description
     this.visibleUpdateModal = true
   }
 
@@ -67,54 +70,43 @@ export class DanhSachComponent implements OnInit {
   }
 
   onDetailVuAn(vuAn: IVuAn) {
-    this.taiLieuService.setIdVuAn(vuAn.id)
+    this.detailVuAnService.setIdVuAn(vuAn.id)
     void this.router.navigate(['/detail-vu-an'])
   }
 
-  constructor(private vuAnService: VuAnService, private router: Router, private taiLieuService: TaiLieuService) {
+  constructor(private vuAnService: VuAnService, private router: Router, private detailVuAnService: DetailVuAnService) {
   }
 
   ngOnInit() {
-    // this.vuAnService.apiVuAn()
-    this.vuAn = [
-      {
-        id: 1,
-        name: 'vụ án 1'
-      }, {
-        id: 2,
-        name: 'vụ án 2'
-      }, {
-        id: 3,
-        name: 'vụ án 3'
-      }, {
-        id: 4,
-        name: 'vụ án 4'
-      }, {
-        id: 5,
-        name: 'vụ án 5'
-      }, {
-        id: 6,
-        name: 'vụ án 6'
-      },
-    ]
+    this.handleGetAllVuAn()
+  }
+
+  handleGetAllVuAn() {
+    this.vuAnService.apiGetAllVuAn().subscribe((res: IVuAn[]) => {
+      this.vuAn = res
+    })
   }
 
 
   onConfirmCreateVuAn() {
-    console.log('this.createVuAn', this.createVuAn)
-    this.vuAnService.apiCreateVuAn(this.createVuAn)
-    this.visibleCreateModal = false
+    this.vuAnService.apiCreateVuAn(this.createVuAn).subscribe(() => {
+      this.handleGetAllVuAn()
+      this.visibleCreateModal = false
+    })
   }
 
   onConfirmUpdateVuAn() {
-    console.log('updateVuAn:', this.updateVuAn)
-    this.vuAnService.apiUpdateVuAn(this.updateVuAn)
-    this.visibleUpdateModal = false
+    this.vuAnService.apiUpdateVuAn(this.updateVuAn).subscribe(() => {
+      this.handleGetAllVuAn()
+      this.visibleUpdateModal = false
+    })
+
   }
 
   onConfirmDeleteVuAn() {
-    console.log('deleteVuAn', this.deleteVuAn)
-    this.visibleDeleteModal = false
-    this.vuAnService.apiDeleteVuAn(this.deleteVuAn.id)
+    this.vuAnService.apiDeleteVuAn(this.deleteVuAn.id).subscribe(() => {
+      this.handleGetAllVuAn()
+      this.visibleDeleteModal = false
+    })
   }
 }

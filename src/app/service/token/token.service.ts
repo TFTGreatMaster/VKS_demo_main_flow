@@ -13,10 +13,7 @@ export class TokenService {
 
   Domain = "http://localhost:3000"
 
-  apiToken(): IToken {
-    // return this.http.get<IToken>(this.Domain)
-    return {
-      newAccessToken: 'token mẫu'
-    }
+  apiToken(): Observable<IToken> {
+    return this.http.get<IToken>(this.Domain)
   }
 }

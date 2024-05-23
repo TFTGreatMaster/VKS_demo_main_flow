@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-// import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 
-
 import {MenuItem} from 'primeng/api';
+import {FileUploadEvent} from "primeng/fileupload";
 
 import {IBreadCrumbItem} from "../../core/interface/index.interface";
 import {IDataProps, ISelectItem} from '../defaul-card/defaul-card.component';
+import {DOMAIN} from "../../util/constant";
+import {TaiLieuService} from "../../service/tai-lieu/tai-lieu.service";
 
 
 interface IRootDocument {
@@ -28,10 +29,9 @@ interface UploadEvent {
   styleUrls: ['./tai-lieu.component.scss'],
 })
 export class TaiLieuComponent implements OnInit {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private taiLieuSerVice: TaiLieuService) {
   }
 
-  private DOMAIN = 'http://192.168.1.50:8082'
 
   breadCrumb: {
     items: MenuItem[],
@@ -65,14 +65,16 @@ export class TaiLieuComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.breadCrumb.items.push({label: 'Tài liệu', id: '6', index: 1})
-    this.handleGetDocuments({id: 6, name: ''})
+    this.taiLieuSerVice.rootId$.subscribe((idRoot) => {
+      this.breadCrumb.items.push({label: 'Tài liệu', id: `${idRoot}`, index: 1})
+      this.handleGetDocuments({id: idRoot, name: ''})
+    })
+
   }
 
   handleGetDocuments(data: { id: number, name: string }) {
-    console.log('handleGetDocument: ==============> ', data)
     this.http
-      .get<IRootDocument>(`${this.DOMAIN}/document/${data.id}`)
+      .get<IRootDocument>(`${DOMAIN}/document/${data.id}`)
       .subscribe((res: IRootDocument) => {
         const arrFile: IDataProps[] = [];
         const arrFolder: IDataProps[] = [];
@@ -116,20 +118,18 @@ export class TaiLieuComponent implements OnInit {
   }
 
   onCreateConfirm(): void {
-    console.log('this.folderCreate.name', this.folderCreate.name)
     this.isCreateModal = false;
     const idParent = this.breadCrumb.items[this.breadCrumb.items.length - 1].id
-    this.http.post(`${this.DOMAIN}/vu-an/1/documents`, {
+    this.http.post(`${DOMAIN}/document/create-folder/${idParent}`, {
       name: this.folderCreate.name,
       type: this.folderCreate.type,
-      parent_document_id: idParent
     }).subscribe(() => {
       this.handleReload()
     })
   }
 
   onUpdateItem(data: ISelectItem) {
-    this.http.put(`${this.DOMAIN}/document/update/${data.id}`, {
+    this.http.put(`${DOMAIN}/document/update/${data.id}`, {
       name: data.name,
     }).subscribe(() => {
       this.handleReload()
@@ -140,19 +140,17 @@ export class TaiLieuComponent implements OnInit {
     this.isCreateModal = false;
   }
 
-  onUpload(event: any): void {
-    console.log('event', event)
+  onUpload(event: FileUploadEvent): void {
     const idParent = this.breadCrumb.items[this.breadCrumb.items.length - 1].id
     const formData = new FormData();
     formData.append(`file`, event.files[0]);
-    this.http.post(`${this.DOMAIN}/document/create-file/${idParent}`, formData).subscribe(() => {
+    this.http.post(`${DOMAIN}/document/create-file/${idParent}`, formData).subscribe(() => {
       this.handleReload()
     })
   }
 
   onDeleteItem(id: number) {
-    console.log('idid', id)
-    this.http.delete(`${this.DOMAIN}/document/${id}`).subscribe(() => {
+    this.http.delete(`${DOMAIN}/document/${id}`).subscribe(() => {
       this.handleReload()
     })
   }

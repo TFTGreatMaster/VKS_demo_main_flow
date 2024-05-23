@@ -9,10 +9,10 @@
     </div>
     <div class="home-header">
       <p-button label="Add Folder" icon="pi pi-folder-plus" iconPos="right" (onClick)="onShowCreateModal()"/>
-      <p-button label="Upload File" icon="pi pi-file-plus" iconPos="right" [style]="{'margin': '20px' }"/>
       <p-fileUpload
+        [style]="{'marginLeft': '20px' }"
         mode="basic"
-        chooseLabel="Choose" chooseIcon="pi pi-upload"
+        chooseLabel="Upload File" chooseIcon="pi pi-upload"
         url="https://www.primefaces.org/cdn/api/upload.php" maxFileSize="100000000"
         [auto]="true"
         (onUpload)="onUpload($event)"/>

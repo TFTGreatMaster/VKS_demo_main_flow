@@ -9,19 +9,21 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 
 import { DefaulCardComponent } from './defaul-card.component';
 import {InputTextModule} from "primeng/inputtext";
+import {ImageModule} from "primeng/image";
 
 @NgModule({
   declarations: [DefaulCardComponent],
-  imports: [
-    CommonModule,
-    CardModule,
-    ButtonModule,
-    DividerModule,
-    DialogModule,
-    FormsModule,
-    SplitButtonModule,
-    InputTextModule,
-  ],
+    imports: [
+        CommonModule,
+        CardModule,
+        ButtonModule,
+        DividerModule,
+        DialogModule,
+        FormsModule,
+        SplitButtonModule,
+        InputTextModule,
+        ImageModule,
+    ],
   exports: [DefaulCardComponent],
 })
 export class DefaulCardModule {}

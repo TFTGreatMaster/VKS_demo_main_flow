@@ -9,11 +9,11 @@ export class TaiLieuService {
   constructor() {
   }
 
-  private idVuAn = new BehaviorSubject<any>(null);
-  idVuAn$ = this.idVuAn.asObservable();
+  private rootId = new BehaviorSubject<any>(null);
+  rootId$ = this.rootId.asObservable();
 
-  setIdVuAn(idVuAn: any) {
-    this.idVuAn.next(idVuAn);
+  setIdRoot(rootId: number) {
+    this.rootId.next(rootId);
   }
 
 }

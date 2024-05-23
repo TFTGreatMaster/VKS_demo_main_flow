@@ -18,32 +18,34 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {TokenRoutingModule} from "./component/token/token-routing.module";
 import {DanhSachRoutingModule} from "./component/danh-sach/danh-sach-routing.module";
 import {DetaiVuAnRoutingModule} from "./component/detail-vu-an/detail-vu-an-routing.module";
+import {ButtonModule} from "primeng/button";
 
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    CoreModule,
-    SharedModule,
-    TaiLieuModule,
-    TokenRoutingModule,
-    DanhSachRoutingModule,
-    DetaiVuAnRoutingModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: httpLoaderFactory,
-        deps: [HttpClient]
-      }
-    })
-  ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        CoreModule,
+        SharedModule,
+        TaiLieuModule,
+        TokenRoutingModule,
+        DanhSachRoutingModule,
+        DetaiVuAnRoutingModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: httpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        ButtonModule
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })

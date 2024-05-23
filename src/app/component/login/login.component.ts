@@ -40,8 +40,14 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    // this.loginService.apiLogin(this.loginForm.value).subscribe(() => {
-    void this.router.navigate(['/token'])
-    // })
+    this.loginService.apiLogin(this.loginForm.value).subscribe((res) => {
+      if (res && res.message === "Đăng nhập thành công") {
+        localStorage.setItem('token', res.token)
+        void this.router.navigate(['/token'])
+      } else {
+        alert('Đăng nhập thất bại')
+        this.submitted = false;
+      }
+    })
   }
 }

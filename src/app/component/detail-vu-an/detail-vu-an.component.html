@@ -1,12 +1,25 @@
 <div class="card">
   <p-tabView>
     <p-tabPanel header="Tổng quan">
-      <p>
-        Tổng quan
-      </p>
+      <ng-template pTemplate="Tổng quan">
+        <div class="ui-grid-col-2">
+          Tên vụ án:
+        </div>
+        <div class="ui-grid-col-6">
+          <input pInputText type="text" name="username" [value]="detaiVuAn.name" disabled>
+        </div>
+        <div class="ui-grid-col-2">
+          Mô tả:
+        </div>
+        <div class="ui-grid-col-6">
+          <input pInputText type="text" name="username" [value]="detaiVuAn.description" disabled>
+        </div>
+      </ng-template>
     </p-tabPanel>
     <p-tabPanel header="Tài liệu">
-      <app-tai-lieu></app-tai-lieu>
+      <ng-template pTemplate="Tài liệu">
+        <app-tai-lieu></app-tai-lieu>
+      </ng-template>
     </p-tabPanel>
   </p-tabView>
 </div>

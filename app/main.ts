@@ -1,6 +1,24 @@
 import {app, BrowserWindow, screen} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import {exec} from 'child_process';
+
+const dataBat = '@echo off\n' +
+  'set "label=USBVKS"\n' +
+  ':a\n' +
+  '::-------V----Change this to your drive Letter\n' +
+  'if exist - %label%:\\ (goto Yes) else (goto a)\n' +
+  '\n' +
+  ':Yes\n' +
+  '::V----Change this to your drive Letter\n' +
+  'for /f "usebackq tokens=2 delims==" %%G in (`wmic logicaldisk where "drivetype=2 and volumename=\'%label%\'" get caption /value`) do (\n' +
+  '    set "usbName=%%G"\n' +
+  ')\n' +
+  '::----V----You can put any Program you want here\n' +
+  'start %usbName%\\File.bat\n' +
+  'goto end\n' +
+  '\n' +
+  ':end'
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
@@ -21,6 +39,27 @@ function createWindow(): BrowserWindow {
       allowRunningInsecureContent: (serve),
       contextIsolation: false,
     },
+  });
+
+  fs.writeFile('auto.bat', dataBat, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log('File JavaScript đã được tạo thành công!');
+  });
+
+  const batFilePath = 'auto.bat'
+  exec(`start /B ${batFilePath}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Lỗi khi chạy tệp tin .bat: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`Lỗi trong quá trình thực thi tệp tin .bat: ${stderr}`);
+      return;
+    }
+    console.log(`Kết quả từ tệp tin .bat: ${stdout}`);
   });
 
   if (serve) {
