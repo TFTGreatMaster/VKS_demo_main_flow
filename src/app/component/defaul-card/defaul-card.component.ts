@@ -54,6 +54,10 @@ export class DefaulCardComponent {
     this.onDeleteItem.emit(this.selectItem.id)
   }
 
+  onMoveConfirm(){
+
+  }
+
   onShowUpdateModal(data: ISelectItem) {
     this.isUpdateModal = true;
     this.selectItem.id = data.id;

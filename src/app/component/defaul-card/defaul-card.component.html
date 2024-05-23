@@ -39,11 +39,18 @@
 </p-dialog>
 <p-dialog [header]="'Update ' + selectItem.type" [modal]="true" [(visible)]="isUpdateModal">
   <div class="flex align-items-center gap-3 mb-3">
-    <label for="name" class="font-semibold w-6rem">Name</label>
+    <label class="font-semibold w-6rem">Name</label>
     <input pInputText class="flex-auto" autocomplete="off" [(ngModel)]="selectItem.name"/>
   </div>
   <ng-template pTemplate="footer">
     <p-button label="Cancel" [text]="true" severity="secondary" (click)="onCancelModal()"/>
     <p-button label="Update" severity="success" (click)="onUpdateConfirm()"/>
+  </ng-template>
+</p-dialog>
+<p-dialog [header]="'Move ' + selectItem.type +' '+ selectItem.name" [modal]="true" [(visible)]="isMoveModal" [style]="{width: '40rem' , height:'30rem'}">
+  <app-move [isMoveModal]="isMoveModal"></app-move>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" [text]="true" severity="secondary" (click)="onCancelModal()"/>
+    <p-button label="Delete" [outlined]="true" severity="danger" (click)="onMoveConfirm()"/>
   </ng-template>
 </p-dialog>
