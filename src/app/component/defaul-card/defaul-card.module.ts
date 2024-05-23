@@ -10,6 +10,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { DefaulCardComponent } from './defaul-card.component';
 import {InputTextModule} from "primeng/inputtext";
 import {ImageModule} from "primeng/image";
+import {MoveComponent} from "../move/move.component";
 
 @NgModule({
   declarations: [DefaulCardComponent],
@@ -23,6 +24,7 @@ import {ImageModule} from "primeng/image";
         SplitButtonModule,
         InputTextModule,
         ImageModule,
+        MoveComponent,
     ],
   exports: [DefaulCardComponent],
 })
