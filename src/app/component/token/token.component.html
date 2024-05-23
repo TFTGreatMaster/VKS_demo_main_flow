@@ -1,27 +1,19 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="tokenForm">
-  <p-panel header="Token Example">
-    <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: auto">
-      <div class="ui-grid-row">
-        <div class="ui-grid-col-2">
-          Token:
-        </div>
-        <div class="ui-grid-col-6">
-          <input pInputText type="text" formControlName="token" class="form-control" name="token">
-        </div>
-        <div class="ui-grid-col-4">
-          <div [hidden]="tokenForm.controls['token'].valid || !tokenForm.controls['token'].dirty"
-               class="alert alert-danger">
-            Token is required
-          </div>
-        </div>
+<p-panel header="Token Example">
+  <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: auto">
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-2">
+        Token:
       </div>
-      <div class="ui-grid-row">
-        <div class="ui-grid-col-2"></div>
-        <div class="ui-grid-col-6">
-          <button pButton type="submit" label="Xác thực"></button>
-        </div>
-        <div class="ui-grid-col-4"></div>
+      <div class="ui-grid-col-6">
+        <input pInputText type="text" class="form-control" name="token" [ngModel]="token">
       </div>
     </div>
-  </p-panel>
-</form>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-2"></div>
+      <div class="ui-grid-col-6">
+        <button pButton label="Xác thực" (click)="onSubmit()"></button>
+      </div>
+      <div class="ui-grid-col-4"></div>
+    </div>
+  </div>
+</p-panel>

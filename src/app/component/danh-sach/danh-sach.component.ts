@@ -109,4 +109,10 @@ export class DanhSachComponent implements OnInit {
       this.visibleDeleteModal = false
     })
   }
+
+  onDownLoadVuAn(vuAn: IVuAn) {
+    this.vuAnService.apiDownloadVuAn(vuAn.id).subscribe(res => {
+      console.log('res', res)
+    })
+  }
 }

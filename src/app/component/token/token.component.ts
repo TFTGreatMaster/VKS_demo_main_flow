@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {Router} from "@angular/router";
 
 import {InputTextModule} from "primeng/inputtext";
@@ -7,9 +7,10 @@ import {PanelModule} from "primeng/panel";
 import {ButtonModule} from "primeng/button";
 
 import * as dayjs from "dayjs";
-import {jwtDecode} from "jwt-decode";
+import {jwtDecode, JwtPayload} from "jwt-decode";
 
 import {TokenService} from "../../service";
+import {IToken} from "../../interface/token/token";
 
 @Component({
   selector: 'app-token',
@@ -18,38 +19,50 @@ import {TokenService} from "../../service";
     ReactiveFormsModule,
     InputTextModule,
     PanelModule,
-    ButtonModule
+    ButtonModule,
+    FormsModule
   ],
   templateUrl: './token.component.html',
   styleUrl: './token.component.scss'
 })
 export class TokenComponent implements OnInit {
-  tokenForm!: FormGroup;
-
-  submitted = false;
+  token: string = ''
 
   constructor(private tokenService: TokenService, private router: Router) {
   }
 
   ngOnInit() {
-    this.tokenForm = new FormGroup({
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      'token': new FormControl('', Validators.required),
-    });
+    this.tokenService.apiToken().subscribe((res: IToken) => {
+      console.log('res', res)
+      this.token = res.newAccessToken
+      this.setUserLocal()
+    })
   }
 
   onSubmit() {
-    this.submitted = true;
-    this.tokenService.apiToken().subscribe((res) => {
-      const usbToken: string = res.newAccessToken
-      const dataServer = jwtDecode(localStorage.getItem('token')!);
-      const dataUsb = jwtDecode(usbToken);
-      const diffMinutes = dayjs(dataServer.iat as number * 1000).diff(dayjs(dataUsb.iat as number * 1000), 'minutes');
-      if (diffMinutes < 15) {
-        void this.router.navigate(['/danh-sach'])
-      } else {
-        alert('Sai token rồi')
-      }
-    })
+    if (this.compareToken(this.token)) {
+      void this.router.navigate(['/danh-sach'])
+    } else {
+      alert('Sai token rồi')
+    }
+  }
+
+  setUserLocal() {
+    const tokenServer = jwtDecode(localStorage.getItem('token')!);
+    localStorage.setItem('user', JSON.stringify(tokenServer))
+  }
+
+  compareToken(tokenUsb: string): boolean {
+    const tokenServer: any = jwtDecode(localStorage.getItem('token')!);
+    const dataUsb: any = jwtDecode(tokenUsb);
+    const diffMinutes = dayjs(tokenServer.iat as number * 1000).diff(dayjs(dataUsb.iat as number * 1000), 'minutes');
+    console.log('dataUsb', dataUsb)
+    console.log('tokenServer', tokenServer)
+    const privateUsb = dataUsb?.privateKey
+    const privateServer = dataUsb?.privateKey
+    console.log('privateUsb', privateUsb)
+    console.log('privateServer', privateServer)
+    return diffMinutes < 15
+
   }
 }

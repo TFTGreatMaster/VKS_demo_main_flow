@@ -1,3 +1,3 @@
-export const DOMAIN = 'http://192.168.1.50:8082'
+export const DOMAIN = 'http://100.121.194.103:8082'
 
 

@@ -1,13 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Router} from "@angular/router";
-import {HttpClient} from "@angular/common/http";
 
 import {InputTextModule} from "primeng/inputtext";
 import {PanelModule} from "primeng/panel";
 import {ButtonModule} from "primeng/button";
 
 import {LoginService} from '../../service'
+import {isModeOffline} from "../../util/common";
+import {MainService} from "../../service/main/main.service";
+import {MODE_PROJECT} from "../../interface/main/main";
 
 @Component({
   selector: 'app-login',
@@ -26,7 +28,11 @@ export class LoginComponent implements OnInit {
 
   submitted = false;
 
-  constructor(private router: Router, private http: HttpClient, private loginService: LoginService) {
+  constructor(
+    private router: Router,
+    private loginService: LoginService,
+    private mainService: MainService
+  ) {
   }
 
   ngOnInit() {
@@ -40,13 +46,26 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    this.loginService.apiLogin(this.loginForm.value).subscribe((res) => {
-      if (res && res.message === "Đăng nhập thành công") {
-        localStorage.setItem('token', res.token)
-        void this.router.navigate(['/token'])
+    this.mainService.mode$.subscribe((mode: MODE_PROJECT) => {
+      if (isModeOffline(mode)) {
+        const user = localStorage.getItem('user')
+        const dataUser = JSON.parse(user || '')
+        const valueForm: { username: string, password: string } = this.loginForm.value
+        if (dataUser.username === valueForm.username && dataUser.password === valueForm.password) {
+          void this.router.navigate(['/token'])
+        } else {
+          console.log('Đăng nhập thất bại')
+        }
       } else {
-        alert('Đăng nhập thất bại')
-        this.submitted = false;
+        this.loginService.apiLogin(this.loginForm.value).subscribe((res) => {
+          if (res && res.message === "Đăng nhập thành công") {
+            localStorage.setItem('token', res.token)
+            void this.router.navigate(['/token'])
+          } else {
+            console.log('Đăng nhập thất bại')
+            this.submitted = false;
+          }
+        })
       }
     })
   }

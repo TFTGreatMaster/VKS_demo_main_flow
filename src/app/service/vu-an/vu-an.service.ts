@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {IVuAn} from "../../interface/vu-an/vu-an";
+import {IVuAn, IVuAnOff} from "../../interface/vu-an/vu-an";
 import {HttpClient} from "@angular/common/http";
 import {DOMAIN} from "../../util/constant";
 import {Observable} from "rxjs";
@@ -26,5 +26,9 @@ export class VuAnService {
 
   apiDeleteVuAn(id: number): Observable<IVuAn> {
     return this.http.delete<IVuAn>(`${DOMAIN}/vu-an/delete/${id}`)
+  }
+
+  apiDownloadVuAn(id: number): Observable<IVuAnOff> {
+    return this.http.get<IVuAnOff>(`${DOMAIN}/vu-an/download/${id}`)
   }
 }

@@ -35,8 +35,8 @@ export class AppComponent {
   }
 
   onToggleMode() {
-    this.mainService.setData(this.Mode === MODE_PROJECT.ONLINE ? MODE_PROJECT.OFFLINE : MODE_PROJECT.ONLINE)
-    this.mainService.data$.subscribe((mode) => {
+    this.mainService.setMode(this.Mode === MODE_PROJECT.ONLINE ? MODE_PROJECT.OFFLINE : MODE_PROJECT.ONLINE)
+    this.mainService.mode$.subscribe((mode) => {
       this.Mode = mode
     })
     void this.router.navigate(['/login'])

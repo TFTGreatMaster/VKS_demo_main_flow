@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {MODE_PROJECT} from "../../interface/main/main";
 
@@ -8,13 +8,13 @@ import {MODE_PROJECT} from "../../interface/main/main";
 export class MainService {
 
   constructor() {
-    this.setData(MODE_PROJECT.ONLINE)
+    this.setMode(MODE_PROJECT.ONLINE)
   }
 
-  private dataSource = new BehaviorSubject<any>(null);
-  data$ = this.dataSource.asObservable();
+  private mode = new BehaviorSubject<any>(null);
+  mode$ = this.mode.asObservable();
 
-  setData(data: MODE_PROJECT) {
-    this.dataSource.next(data);
+  setMode(data: MODE_PROJECT) {
+    this.mode.next(data);
   }
 }
