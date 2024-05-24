@@ -14,6 +14,10 @@ import {IVuAn} from "../../interface/vu-an/vu-an";
 import {VuAnService} from '../../service'
 import {DetailVuAnService} from "../../service/detail-vu-an/detail-vu-an.service";
 import {DOMAIN, mockListVuAn} from "../../util/constant";
+import {MainService} from "../../service/main/main.service";
+import {isModeOffline} from "../../util/common";
+import {MODE_PROJECT} from "../../interface/main/main";
+import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 
 @Component({
   selector: 'app-danh-sach',
@@ -26,12 +30,17 @@ import {DOMAIN, mockListVuAn} from "../../util/constant";
     TooltipModule,
     DialogModule,
     InputTextModule,
-    FormsModule
+    FormsModule,
+    NgSwitch,
+    NgSwitchCase,
+    NgSwitchDefault
   ],
   templateUrl: './danh-sach.component.html',
   styleUrl: './danh-sach.component.scss'
 })
 export class DanhSachComponent implements OnInit {
+
+  mode: MODE_PROJECT = MODE_PROJECT.ONLINE
 
   vuAn!: IVuAn[];
 
@@ -50,6 +59,34 @@ export class DanhSachComponent implements OnInit {
   deleteVuAn: Omit<IVuAn, 'description'> = {
     id: 0,
     name: '',
+  }
+
+  constructor(
+    private vuAnService: VuAnService,
+    private router: Router,
+    private detailVuAnService: DetailVuAnService,
+    private mainService: MainService
+  ) {
+  }
+
+
+  ngOnInit() {
+    this.mainService.mode$.subscribe((mode: MODE_PROJECT) => {
+      this.mode = mode
+    })
+    isModeOffline(this.mode) ? this.handleGetVuAnOffline() : this.handleGetAllVuAn()
+  }
+
+  handleGetVuAnOffline() {
+    const dataVuAnJson = localStorage.getItem('list-vu-an')
+    const dataVuAn = JSON.parse(dataVuAnJson || "")
+    console.log('dataVuAn', dataVuAn)
+    this.vuAn = dataVuAn.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description
+    }))
+    console.log('this.vuAn ', this.vuAn)
   }
 
   onShowCreate() {
@@ -74,19 +111,11 @@ export class DanhSachComponent implements OnInit {
     void this.router.navigate(['/detail-vu-an'])
   }
 
-  constructor(private vuAnService: VuAnService, private router: Router, private detailVuAnService: DetailVuAnService) {
-  }
-
-  ngOnInit() {
-    this.handleGetAllVuAn()
-  }
-
   handleGetAllVuAn() {
     this.vuAnService.apiGetAllVuAn().subscribe((res: IVuAn[]) => {
       this.vuAn = res
     })
   }
-
 
   onConfirmCreateVuAn() {
     this.vuAnService.apiCreateVuAn(this.createVuAn).subscribe(() => {
@@ -121,4 +150,6 @@ export class DanhSachComponent implements OnInit {
       fileName: `Va1.zip`
     });
   }
+
+  protected readonly MODE_PROJECT = MODE_PROJECT;
 }

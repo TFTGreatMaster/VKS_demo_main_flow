@@ -7,16 +7,23 @@
         (onClickItem)="handleClickBreadCrumd($event)"
       ></app-bread-crumb>
     </div>
-    <div class="home-header">
-      <p-button label="Add Folder" icon="pi pi-folder-plus" iconPos="right" (onClick)="onShowCreateModal()"/>
-      <p-fileUpload
-        [style]="{'marginLeft': '20px' }"
-        mode="basic"
-        chooseLabel="Upload File" chooseIcon="pi pi-upload"
-        url="https://www.primefaces.org/cdn/api/upload.php" maxFileSize="100000000"
-        [auto]="true"
-        (onUpload)="onUpload($event)"/>
-    </div>
+    <ng-container [ngSwitch]="mode">
+      <ng-container *ngSwitchCase="MODE_PROJECT.OFFLINE">
+
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <div class="home-header">
+          <p-button label="Add Folder" icon="pi pi-folder-plus" iconPos="right" (onClick)="onShowCreateModal()"/>
+          <p-fileUpload
+            [style]="{'marginLeft': '20px' }"
+            mode="basic"
+            chooseLabel="Upload File" chooseIcon="pi pi-upload"
+            url="https://www.primefaces.org/cdn/api/upload.php" maxFileSize="100000000"
+            [auto]="true"
+            (onUpload)="onUpload($event)"/>
+        </div>
+      </ng-container>
+    </ng-container>
     <p-divider align="left" class="home-divider">
       <b>Folder</b>
     </p-divider>
@@ -24,7 +31,7 @@
       <app-defaul-card
         *ngFor="let item of folderData"
         [props]="item"
-        (onClickItem)="handleGetDocuments($event)"
+        (onClickItem)="handleClickFolder($event)"
         (onDeleteItem)="onDeleteItem($event)"
         (onUpdateItem)="onUpdateItem($event)"
       ></app-defaul-card>
@@ -51,8 +58,8 @@
       <p-button label="Create" (click)="onCreateConfirm()"/>
     </div>
   </p-dialog>
-  <video width="640" height="480" controls>
-    <source src="http://192.168.1.50:8082/document/uploads/1716193695131_Demo_UI_Flow.mov"/>
-  </video>
-  <app-move></app-move>
+  <!--  <video width="640" height="480" controls>-->
+  <!--    <source src="http://192.168.1.50:8082/document/uploads/1716193695131_Demo_UI_Flow.mov"/>-->
+  <!--  </video>-->
+  <!--  <app-move></app-move>-->
 </div>

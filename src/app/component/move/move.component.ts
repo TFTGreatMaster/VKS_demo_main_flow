@@ -46,7 +46,6 @@ export class MoveComponent implements OnChanges {
   //   this.taiLieuSerVice.rootId$.subscribe((idRoot) => {
   //     this.handleGetDocuments({id: idRoot, name: ''})
   //   })
-  //
   // }
 
   handleGetDocuments(data: { id: number, name: string }) {

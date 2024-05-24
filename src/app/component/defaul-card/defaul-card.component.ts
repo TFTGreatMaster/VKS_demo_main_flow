@@ -1,4 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {MainService} from "../../service/main/main.service";
+import {MODE_PROJECT} from "../../interface/main/main";
 
 export interface IDataProps {
   id: number;
@@ -18,7 +20,7 @@ export interface ISelectItem {
   templateUrl: './defaul-card.component.html',
   styleUrl: './defaul-card.component.scss',
 })
-export class DefaulCardComponent {
+export class DefaulCardComponent implements OnInit {
   @Input() props!: IDataProps;
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   @Output() onClickItem: EventEmitter<any> = new EventEmitter<any>()
@@ -35,6 +37,16 @@ export class DefaulCardComponent {
     name: '',
     type: 'folder',
   };
+  mode: MODE_PROJECT = MODE_PROJECT.ONLINE
+
+  constructor(private mainService: MainService) {
+  }
+
+  ngOnInit() {
+    this.mainService.mode$.subscribe((mode: MODE_PROJECT) => {
+      this.mode = mode
+    })
+  }
 
   showName() {
     if (this.props.type === 'file') {
@@ -82,4 +94,6 @@ export class DefaulCardComponent {
   onClickCard({documentId, documentName}: any) {
     this.onClickItem.emit({id: documentId, name: documentName})
   }
+
+  protected readonly MODE_PROJECT = MODE_PROJECT;
 }

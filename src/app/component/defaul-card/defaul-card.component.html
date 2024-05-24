@@ -2,32 +2,46 @@
   <div class="card-content" *ngIf="props.type === 'folder'"
   >
     <span (click)="onClickCard({documentId: props.id, documentName: props.name})">{{ props.name }}</span>
-    <div>
-      <i class="pi pi-cog" style="font-size: 1.5rem; padding-right:8px;"
-         (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
-      <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem; padding-right:8px;"
-         (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
-      <i class="pi pi-trash" style="font-size: 1.5rem"
-         (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
-    </div>
+    <ng-container [ngSwitch]="mode">
+      <ng-container *ngSwitchCase="MODE_PROJECT.OFFLINE">
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <div>
+          <i class="pi pi-cog" style="font-size: 1.5rem; padding-right:8px;"
+             (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
+          <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem; padding-right:8px;"
+             (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
+          <i class="pi pi-trash" style="font-size: 1.5rem"
+             (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
+        </div>
+      </ng-container>
+    </ng-container>
   </div>
   <ng-template pTemplate="header" *ngIf="props.type === 'file'">
     <p-image
       [src]="props.url"
       alt="Image"
       width="250"
-      [preview]="true" />
+      [preview]="true"/>
   </ng-template>
   <ng-template pTemplate="footer" *ngIf="props.type === 'file'">
     <div class="card-footer">
-      <i class="pi pi-cog" style="font-size: 1.5rem"
-         (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
-      <p-divider layout="vertical"/>
-      <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem"
-         (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
-      <p-divider layout="vertical"/>
-      <i class="pi pi-trash" style="font-size: 1.5rem"
-         (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
+
+      <ng-container [ngSwitch]="mode">
+        <ng-container *ngSwitchCase="MODE_PROJECT.OFFLINE">
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <i class="pi pi-cog" style="font-size: 1.5rem"
+             (click)="onShowUpdateModal({id: props.id, name: props.name, type: props.type})"></i>
+          <p-divider layout="vertical"/>
+          <i class="pi pi-arrow-right-arrow-left" style="font-size: 1.5rem"
+             (click)="onShowMoveModal({id: props.id, name: props.name, type: props.type})"></i>
+          <p-divider layout="vertical"/>
+          <i class="pi pi-trash" style="font-size: 1.5rem"
+             (click)="onShowDeleteModal({id: props.id, name: props.name, type: props.type})"></i>
+        </ng-container>
+      </ng-container>
+
     </div>
   </ng-template>
 </p-card>

@@ -8,6 +8,10 @@ import {IBreadCrumbItem} from "../../core/interface/index.interface";
 import {IDataProps, ISelectItem} from '../defaul-card/defaul-card.component';
 import {DOMAIN} from "../../util/constant";
 import {TaiLieuService} from "../../service/tai-lieu/tai-lieu.service";
+import {MODE_PROJECT} from "../../interface/main/main";
+import {MainService} from "../../service/main/main.service";
+import {isModeOffline} from "../../util/common";
+import {DetailVuAnService} from "../../service/detail-vu-an/detail-vu-an.service";
 
 
 export interface IRootDocument {
@@ -30,9 +34,10 @@ interface UploadEvent {
   styleUrls: ['./tai-lieu.component.scss'],
 })
 export class TaiLieuComponent implements OnInit {
-  constructor(private http: HttpClient, private taiLieuSerVice: TaiLieuService) {
-  }
 
+  mode: MODE_PROJECT = MODE_PROJECT.ONLINE
+
+  idVuAn!: number
 
   breadCrumb: {
     items: MenuItem[],
@@ -64,13 +69,56 @@ export class TaiLieuComponent implements OnInit {
     type: 'folder',
   };
 
+  constructor(
+    private http: HttpClient,
+    private taiLieuSerVice: TaiLieuService,
+    private mainService: MainService,
+    private detailVuAnService: DetailVuAnService
+  ) {
+  }
 
   ngOnInit(): void {
-    this.taiLieuSerVice.rootId$.subscribe((idRoot) => {
-      this.breadCrumb.items.push({label: 'Tài liệu', id: `${idRoot}`, index: 1})
-      this.handleGetDocuments({id: idRoot, name: ''})
+    this.detailVuAnService.idVuAn$.subscribe((idVuAn: number) => {
+      this.idVuAn = idVuAn
     })
+    this.taiLieuSerVice.rootId$.subscribe((idRoot: number) => {
+      this.breadCrumb.items.push({label: 'Tài liệu', id: `${idRoot}`, index: 1})
+      this.mainService.mode$.subscribe((mode: MODE_PROJECT) => {
+        this.mode = mode
+        isModeOffline(mode) ?
+          this.handleGetDocumentsOffline({id: idRoot, name: ''})
+          :
+          this.handleGetDocuments({id: idRoot, name: ''})
+      })
+    })
+  }
 
+  handleGetDocumentsOffline(data: { id: number, name: string }) {
+    const dataVuAnJson = localStorage.getItem('list-vu-an')
+    const listVuAn = JSON.parse(dataVuAnJson || "")
+    const arrFile: IDataProps[] = [];
+    const arrFolder: IDataProps[] = [];
+    if (listVuAn.length) {
+      const vuAn = listVuAn.find((item: any) => item.id === this.idVuAn)
+      const document = vuAn.documents
+      document.forEach((item: any) => {
+        if (item.parentDocumentId === data.id) {
+          item.type === 'folder' ? arrFolder.push(item) : arrFile.push(item)
+        }
+      })
+      this.folderData = [...arrFolder];
+      this.fileData = [...arrFile];
+    } else {
+      this.folderData = [...arrFolder];
+      this.fileData = [...arrFile];
+    }
+    if (data.name !== '' && !this.breadCrumb.items.find((value) => Number(value.id) === data.id)) {
+      this.breadCrumb.items = [...this.breadCrumb.items, {
+        label: data.name,
+        id: `${data.id}`,
+        index: this.breadCrumb.items.length + 1
+      }]
+    }
   }
 
   handleGetDocuments(data: { id: number, name: string }) {
@@ -111,7 +159,9 @@ export class TaiLieuComponent implements OnInit {
 
   handleClickBreadCrumd(item: IBreadCrumbItem) {
     this.breadCrumb.items = this.breadCrumb.items.slice(0, item.index)
-    this.handleGetDocuments({id: Number(item.id), name: item.label})
+    isModeOffline(this.mode) ?
+      this.handleGetDocumentsOffline({id: Number(item.id), name: item.label})
+      : this.handleGetDocuments({id: Number(item.id), name: item.label})
   }
 
   onShowCreateModal(): void {
@@ -155,4 +205,12 @@ export class TaiLieuComponent implements OnInit {
       this.handleReload()
     })
   }
+
+  handleClickFolder(data: { id: number, name: string }) {
+    isModeOffline(this.mode)
+      ? this.handleGetDocumentsOffline(data)
+      : this.handleGetDocuments(data)
+  }
+
+  protected readonly MODE_PROJECT = MODE_PROJECT;
 }

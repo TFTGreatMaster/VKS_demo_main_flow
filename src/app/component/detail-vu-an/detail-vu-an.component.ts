@@ -7,6 +7,9 @@ import {IDetailVuAn} from "../../interface/detail-vu-an/detail-vu-an";
 import {InputTextModule} from "primeng/inputtext";
 import {PaginatorModule} from "primeng/paginator";
 import {ReactiveFormsModule} from "@angular/forms";
+import {MainService} from "../../service/main/main.service";
+import {MODE_PROJECT} from "../../interface/main/main";
+import {isModeOffline} from "../../util/common";
 
 @Component({
   selector: 'app-detail-vu-an',
@@ -23,6 +26,9 @@ import {ReactiveFormsModule} from "@angular/forms";
 })
 export class DetailVuAnComponent implements OnInit {
 
+  idVuAn!: number
+  mode: MODE_PROJECT = MODE_PROJECT.ONLINE
+
   detaiVuAn: IDetailVuAn = {
     id: 0,
     name: "",
@@ -30,15 +36,36 @@ export class DetailVuAnComponent implements OnInit {
     rootId: 0
   }
 
-  constructor(private taiLieuService: TaiLieuService, private detailVuAnService: DetailVuAnService) {
+  constructor(
+    private taiLieuService: TaiLieuService,
+    private detailVuAnService: DetailVuAnService,
+    private mainService: MainService
+  ) {
   }
 
   ngOnInit() {
     this.detailVuAnService.idVuAn$.subscribe((idVuAn: number) => {
-      this.detailVuAnService.apiGetDetailVuAn(idVuAn).subscribe((detailVuAn: IDetailVuAn) => {
+      this.idVuAn = idVuAn
+    })
+    this.mainService.mode$.subscribe((mode: MODE_PROJECT) => {
+      isModeOffline(mode) ? this.mode = MODE_PROJECT.OFFLINE : this.mode = MODE_PROJECT.ONLINE
+    })
+    if (isModeOffline(this.mode)) {
+      const dataVuAnJson = localStorage.getItem('list-vu-an')
+      const listVuAn = JSON.parse(dataVuAnJson || "")
+      const vuAn = listVuAn.find((item: any) => item.id === this.idVuAn)
+      this.detaiVuAn = {
+        id: vuAn.id,
+        name: vuAn.name,
+        description: vuAn.description,
+        rootId: vuAn.rootId
+      }
+      this.taiLieuService.setIdRoot(this.detaiVuAn.rootId)
+    } else {
+      this.detailVuAnService.apiGetDetailVuAn(this.idVuAn).subscribe((detailVuAn: IDetailVuAn) => {
         this.detaiVuAn = detailVuAn
         this.taiLieuService.setIdRoot(detailVuAn.rootId)
       })
-    })
+    }
   }
 }

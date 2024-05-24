@@ -1,73 +1,119 @@
 <p-panel header="Danh sách vụ án">
-  <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: auto">
-    <div class="ui-grid-row">
-      <div class="ui-grid-col">
-        <p-button (click)="onShowCreate()">Thêm mới vụ án</p-button>
+  <ng-container [ngSwitch]="mode">
+    <ng-container *ngSwitchCase="MODE_PROJECT.OFFLINE">
+      <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: auto">
+        <div class="ui-grid-row">
+          <div class="ui-grid-col">
+            <p-button (click)="onShowCreate()">Thêm mới vụ án</p-button>
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-2">
+            <p-table [value]="vuAn" [tableStyle]="{ 'min-width': '50rem' }">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>id</th>
+                  <th>Tên vụ án</th>
+                  <th>Mô tả</th>
+                  <th style="width: 5rem">Hành động</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-vuAn>
+                <tr>
+                  <td>{{ vuAn.id }}</td>
+                  <td>{{ vuAn.name }}</td>
+                  <td>{{ vuAn.description }}</td>
+                  <td style="display: flex">
+                    <button
+                      style="margin-left: 10px"
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-eye"
+                      pTooltip="Xem chi tiết"
+                      tooltipPosition="top"
+                      (click)="onDetailVuAn(vuAn)">
+                    </button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="ui-grid-row">
-      <div class="ui-grid-col-2">
-        <p-table [value]="vuAn" [tableStyle]="{ 'min-width': '50rem' }">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>id</th>
-              <th>Tên vụ án</th>
-              <th>Mô tả</th>
-              <th style="width: 5rem">Hành động</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-vuAn>
-            <tr>
-              <td>{{ vuAn.id }}</td>
-              <td>{{ vuAn.name }}</td>
-              <td>{{ vuAn.description }}</td>
-              <td style="display: flex">
-                <button
-                  type="button"
-                  pButton
-                  pRipple
-                  icon="pi pi-arrow-down"
-                  pTooltip="Tải về vụ án"
-                  tooltipPosition="top"
-                  (click)="onDownLoadVuAn(vuAn)">
-                </button>
-                <button
-                  style="margin-left: 10px"
-                  type="button"
-                  pButton
-                  pRipple
-                  icon="pi pi-eye"
-                  pTooltip="Xem chi tiết"
-                  tooltipPosition="top"
-                  (click)="onDetailVuAn(vuAn)">
-                </button>
-                <button
-                  style="margin-left: 10px"
-                  type="button"
-                  pButton
-                  pRipple
-                  icon="pi pi-file-edit"
-                  pTooltip="Chỉnh sửa"
-                  tooltipPosition="top"
-                  (click)="onShowUpdateVuan(vuAn)">
-                </button>
-                <button
-                  style="margin-left: 10px"
-                  type="button"
-                  pButton
-                  pRipple
-                  icon="pi pi-trash"
-                  pTooltip="Xóa"
-                  tooltipPosition="top"
-                  (click)="onShowDeleteVuan(vuAn)">
-                </button>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <div class="ui-grid ui-grid-responsive ui-grid-pad ui-fluid" style="margin: auto">
+        <div class="ui-grid-row">
+          <div class="ui-grid-col">
+            <p-button (click)="onShowCreate()">Thêm mới vụ án</p-button>
+          </div>
+        </div>
+        <div class="ui-grid-row">
+          <div class="ui-grid-col-2">
+            <p-table [value]="vuAn" [tableStyle]="{ 'min-width': '50rem' }">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>id</th>
+                  <th>Tên vụ án</th>
+                  <th>Mô tả</th>
+                  <th style="width: 5rem">Hành động</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-vuAn>
+                <tr>
+                  <td>{{ vuAn.id }}</td>
+                  <td>{{ vuAn.name }}</td>
+                  <td>{{ vuAn.description }}</td>
+                  <td style="display: flex">
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-arrow-down"
+                      pTooltip="Tải về vụ án"
+                      tooltipPosition="top"
+                      (click)="onDownLoadVuAn(vuAn)">
+                    </button>
+                    <button
+                      style="margin-left: 10px"
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-eye"
+                      pTooltip="Xem chi tiết"
+                      tooltipPosition="top"
+                      (click)="onDetailVuAn(vuAn)">
+                    </button>
+                    <button
+                      style="margin-left: 10px"
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file-edit"
+                      pTooltip="Chỉnh sửa"
+                      tooltipPosition="top"
+                      (click)="onShowUpdateVuan(vuAn)">
+                    </button>
+                    <button
+                      style="margin-left: 10px"
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-trash"
+                      pTooltip="Xóa"
+                      tooltipPosition="top"
+                      (click)="onShowDeleteVuan(vuAn)">
+                    </button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </ng-container>
+  </ng-container>
   <p-dialog header="Thêm mới vụ án" [(visible)]="visibleCreateModal" [style]="{ width: '25rem' }"
             [draggable]="false">
     <div class="flex align-items-center gap-3 mb-3">
