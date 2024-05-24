@@ -1,20 +1,12 @@
-<p-dialog header="Title" [(visible)]="display">
-  <p-table [value]="products">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Name</th>
-        <th>action</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-product>
-      <tr>
-        <td>{{ product.name }}</td>
-<!--        <td><i class="pi-arrow-circle-right" ></i></td>-->
-        <td> <p-button icon="pi pi-pencil" rounded="true" severity="success" /></td>
-        <td> <p-button icon="pi-arrow-circle-right" rounded="true" severity="success" /></td>
-      </tr>
-    </ng-template>
-  </p-table>
-</p-dialog>
+<div>
+  day la move
+  <p-button (click)="onBackCard()"></p-button>
+  <b>Folder</b>
+  <div *ngFor="let item of folderData">
+    <div class="card-content"
+    >
+      <span (click)="onClickCard({documentId: item.id, documentName: item.name})">{{ item.name }}</span>
+    </div>
+  </div>
 
-<p-button type="button" (click)="showDialog()" icon="pi pi-info-circle" label="Show"></p-button>
+</div>

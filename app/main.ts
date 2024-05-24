@@ -1,7 +1,11 @@
-import {app, BrowserWindow, screen} from 'electron';
+import {app, BrowserWindow, ipcMain, screen, ipcRenderer} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import {exec} from 'child_process';
+
+import * as  dl from 'electron-dl';
+
+const decompress = require('decompress');
 
 const dataBat = '@echo off\n' +
   'set "label=USBVKS"\n' +
@@ -62,6 +66,121 @@ function createWindow(): BrowserWindow {
     console.log(`Kết quả từ tệp tin .bat: ${stdout}`);
   });
 
+  const handleCreateFolder = (name: string) => {
+    if (!fs.existsSync(name)) {
+      try {
+        fs.mkdirSync(name);
+      } catch (err) {
+        console.error('Loi tao thu muc:', err);
+      }
+      console.log("🚀 ~ handleCreateFolder ~ name:", name)
+    } else {
+      console.log(`${name} da ton tai`);
+    }
+  };
+
+  const handleUnzip = () => {
+    const files = fs.readdirSync('ZipData').filter((file) => {
+      const extension = path.extname(file);
+      return extension === '.zip';
+    });
+    if (files.length > 0) {
+      files.forEach((file) => {
+        console.log("🚀 ~ files.forEach ~ file:", file)
+        const newFolderName = file.split(".zip")[0]
+        decompress(`ZipData/${file}`, `ZipData/${newFolderName}`).then(() => {
+          try {
+            fs.unlinkSync(`ZipData/${file}`);
+            console.log('Del zip ok');
+          } catch (err) {
+            console.log('Del zip not ok')
+          }
+        }).catch(() => {
+          console.log('err')
+        })
+        ipcRenderer.send('read-file', files)
+        // const fileName = file.split(/[\\/]/).pop();
+      })
+    }
+  };
+
+  const handleRename = () => {
+    const newExtension = '.vks';
+    const renamePath = 'RenameData'
+    const rootPath = 'ZipData'
+    const filesRoot = fs.readdirSync(rootPath)
+    // copy files
+    filesRoot.forEach(file => {
+      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`)
+      if (!fs.existsSync(`${renamePath}/${file}`)) {
+        fs.mkdirSync(`${renamePath}/${file}`);
+        console.log('creating directory RenameData')
+      }
+      filesInFolder.forEach(fileInFolder => {
+        if (!fs.existsSync(`${renamePath}/${fileInFolder}`)) {
+          fs.copyFile(`${rootPath}/${file}/${fileInFolder}`, `${renamePath}/${file}/${fileInFolder}`, (err) => {
+            if (err) {
+              console.error('Error copy', err);
+            } else {
+              console.log('Copy done');
+            }
+          });
+        }
+      })
+
+    });
+    //rename files
+    const filesRename = fs.readdirSync(renamePath)
+    filesRename.forEach(file => {
+      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`)
+      filesInFolder.forEach(fileInFolder => {
+        const newFilePath = path.join(path.dirname(`${renamePath}/${file}/${fileInFolder}`), path.basename(`${renamePath}/${file}/${fileInFolder}`, path.extname(`${renamePath}/${file}/${fileInFolder}`)) + newExtension);
+        fs.rename(`${renamePath}/${file}/${fileInFolder}`, newFilePath, (err) => {
+          if (err) {
+            console.error('Rename error');
+          } else {
+            console.log('Rename succeeded');
+          }
+        });
+      })
+    });
+  };
+
+  handleCreateFolder('ZipData');
+  handleCreateFolder('RenameData');
+
+  ipcMain.on('unzip', () => {
+    handleUnzip();
+  });
+
+  ipcMain.on('switchOffline', () => {
+    handleRename();
+  });
+
+
+  ipcMain.on('download-file', async (event, {downloadUrl, fileName}) => {
+    // Use electron-dl to download the file
+    const win = BrowserWindow.getFocusedWindow();
+    const filesRoot = fs.readdirSync('ZipData')
+    console.log("🚀 ~ ipcMain.on ~ filesRoot:", filesRoot)
+
+    try {
+      const options = {
+        directory: filesRoot[0], // Thay đổi đường dẫn lưu trữ ở đây
+        filename: fileName,
+      };
+      // const downloadItem = await dl.download.then((module) => module.download(win, downloadUrl, options));
+      const downloadItem = await dl.download(win, downloadUrl, options);
+      console.log("🚀 ~ ipcMain.on ~ downloadItem:", downloadItem)
+      // const downloadItem = await dl.download(win, downloadUrl, options);
+      const savePath = downloadItem.getSavePath();
+      console.log("🚀 ~ ipcMain.on ~ savePath:", savePath)
+      console.log('Tệp đã được tải xuống tới:', savePath);
+    } catch (error) {
+      console.log("🚀 ~ ipcMain.on ~ error:", error)
+    }
+  });
+
   if (serve) {
     const debug = require('electron-debug');
     debug();
@@ -73,7 +192,7 @@ function createWindow(): BrowserWindow {
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
 

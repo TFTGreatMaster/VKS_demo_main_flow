@@ -12,8 +12,8 @@ import {InputTextModule} from "primeng/inputtext";
 
 import {IVuAn} from "../../interface/vu-an/vu-an";
 import {VuAnService} from '../../service'
-import {TaiLieuService} from "../../service/tai-lieu/tai-lieu.service";
 import {DetailVuAnService} from "../../service/detail-vu-an/detail-vu-an.service";
+import {DOMAIN, mockListVuAn} from "../../util/constant";
 
 @Component({
   selector: 'app-danh-sach',
@@ -111,8 +111,14 @@ export class DanhSachComponent implements OnInit {
   }
 
   onDownLoadVuAn(vuAn: IVuAn) {
+
     this.vuAnService.apiDownloadVuAn(vuAn.id).subscribe(res => {
       console.log('res', res)
+      localStorage.setItem('list-vu-an', JSON.stringify(mockListVuAn))
     })
+    window.require('electron').ipcRenderer.send('download-file', {
+      downloadUrl: `${DOMAIN}/document/download-zip/${vuAn.id}`,
+      fileName: `Va1.zip`
+    });
   }
 }

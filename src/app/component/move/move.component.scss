@@ -1,0 +1,16 @@
+.card-content {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-style: solid;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.card-name {
+  margin-left: 8px;
+}

@@ -10,7 +10,7 @@ import {DOMAIN} from "../../util/constant";
 import {TaiLieuService} from "../../service/tai-lieu/tai-lieu.service";
 
 
-interface IRootDocument {
+export interface IRootDocument {
   id: number;
   name: string;
   type: 'file' | 'folder';
@@ -22,6 +22,7 @@ interface UploadEvent {
   originalEvent: Event;
   files: File[];
 }
+
 
 @Component({
   selector: 'app-tai-lieu',

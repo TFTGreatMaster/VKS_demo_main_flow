@@ -31,4 +31,5 @@ export class VuAnService {
   apiDownloadVuAn(id: number): Observable<IVuAnOff> {
     return this.http.get<IVuAnOff>(`${DOMAIN}/vu-an/download/${id}`)
   }
+
 }

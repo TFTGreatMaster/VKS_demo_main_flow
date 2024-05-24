@@ -58,10 +58,10 @@ export class TokenComponent implements OnInit {
     const diffMinutes = dayjs(tokenServer.iat as number * 1000).diff(dayjs(dataUsb.iat as number * 1000), 'minutes');
     console.log('dataUsb', dataUsb)
     console.log('tokenServer', tokenServer)
-    const privateUsb = dataUsb?.privateKey
-    const privateServer = dataUsb?.privateKey
-    console.log('privateUsb', privateUsb)
-    console.log('privateServer', privateServer)
+    // const privateUsb = dataUsb?.privateKey
+    // const privateServer = dataUsb?.privateKey
+    // console.log('privateUsb', privateUsb)
+    // console.log('privateServer', privateServer)
     return diffMinutes < 15
 
   }
