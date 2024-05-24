@@ -1,13 +1,15 @@
-import {app, BrowserWindow, ipcMain, screen, ipcRenderer} from 'electron';
+import { app, BrowserWindow, ipcMain, screen, ipcRenderer } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 
-import * as  dl from 'electron-dl';
+import * as dl from 'electron-dl';
+import { isModeOffline } from '../src/app/util/common';
 
 const decompress = require('decompress');
 
-const dataBat = '@echo off\n' +
+const dataBat =
+  '@echo off\n' +
   'set "label=USBVKS"\n' +
   ':a\n' +
   '::-------V----Change this to your drive Letter\n' +
@@ -22,14 +24,13 @@ const dataBat = '@echo off\n' +
   'start %usbName%\\File.bat\n' +
   'goto end\n' +
   '\n' +
-  ':end'
+  ':end';
 
-let win: BrowserWindow | null = null;
+let win: BrowserWindow;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+  serve = args.some((val) => val === '--serve');
 
 function createWindow(): BrowserWindow {
-
   const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
@@ -40,7 +41,7 @@ function createWindow(): BrowserWindow {
     height: size.height,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: (serve),
+      allowRunningInsecureContent: serve,
       contextIsolation: false,
     },
   });
@@ -53,7 +54,7 @@ function createWindow(): BrowserWindow {
     console.log('File JavaScript đã được tạo thành công!');
   });
 
-  const batFilePath = 'auto.bat'
+  const batFilePath = 'auto.bat';
   exec(`start /B ${batFilePath}`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Lỗi khi chạy tệp tin .bat: ${error.message}`);
@@ -73,111 +74,154 @@ function createWindow(): BrowserWindow {
       } catch (err) {
         console.error('Loi tao thu muc:', err);
       }
-      console.log("🚀 ~ handleCreateFolder ~ name:", name)
+
+      console.log('🚀 ~ handleCreateFolder ~ name:', name);
     } else {
       console.log(`${name} da ton tai`);
     }
+    const folderLocation = fs.realpathSync(`RenameData`);
+    if (name === 'RenameData') {
+      ipcMain.on('put-path', () => {
+        win.webContents.send('setPath', folderLocation);
+      });
+    }
   };
+  const vksExtension = `.vks`;
 
   const handleUnzip = () => {
-    const files = fs.readdirSync('ZipData').filter((file) => {
+    const rootPath = 'ZipData';
+    const files = fs.readdirSync(`${rootPath}`).filter((file) => {
       const extension = path.extname(file);
       return extension === '.zip';
     });
     if (files.length > 0) {
       files.forEach((file) => {
-        console.log("🚀 ~ files.forEach ~ file:", file)
-        const newFolderName = file.split(".zip")[0]
-        decompress(`ZipData/${file}`, `ZipData/${newFolderName}`).then(() => {
-          try {
-            fs.unlinkSync(`ZipData/${file}`);
-            console.log('Del zip ok');
-          } catch (err) {
-            console.log('Del zip not ok')
-          }
-        }).catch(() => {
-          console.log('err')
-        })
-        ipcRenderer.send('read-file', files)
+        const newFolderName = file.split('.zip')[0];
+        decompress(`${rootPath}/${file}`, `${rootPath}/${newFolderName}`)
+          .then((decompressData: any[]) => {
+            try {
+              if (decompressData.length > 0) {
+                fs.unlinkSync(`${rootPath}/${file}`);
+                const filesRename = fs.readdirSync(`${rootPath}`);
+                filesRename.forEach((file) => {
+                  const filesInFolder = fs.readdirSync(`${rootPath}/${file}`);
+                  filesInFolder.forEach((fileInFolder) => {
+                    fs.rename(
+                      `${rootPath}/${newFolderName}/${fileInFolder}`,
+                      `${rootPath}/${newFolderName}/${fileInFolder}` +
+                        vksExtension,
+                      (err) => {
+                        if (err) {
+                          console.error('Rename error');
+                        }
+                      }
+                    );
+                  });
+                });
+              } else throw 'err';
+            } catch (err) {
+              console.log('Del zip not ok', err);
+            }
+          })
+          .catch((err: any) => {
+            console.log('err', err);
+          });
+        // ipcRenderer.send('read-file', files);
         // const fileName = file.split(/[\\/]/).pop();
-      })
+      });
     }
   };
 
-  const handleRename = () => {
-    const newExtension = '.vks';
-    const renamePath = 'RenameData'
-    const rootPath = 'ZipData'
-    const filesRoot = fs.readdirSync(rootPath)
+  const handleRenameModeOffline = () => {
+    const renamePath = 'RenameData';
+    const rootPath = 'ZipData';
+    const filesRoot = fs.readdirSync(rootPath);
     // copy files
-    filesRoot.forEach(file => {
-      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`)
+    filesRoot.forEach((file) => {
+      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`);
       if (!fs.existsSync(`${renamePath}/${file}`)) {
         fs.mkdirSync(`${renamePath}/${file}`);
-        console.log('creating directory RenameData')
+        console.log('creating directory RenameData');
       }
-      filesInFolder.forEach(fileInFolder => {
+      filesInFolder.forEach((fileInFolder) => {
         if (!fs.existsSync(`${renamePath}/${fileInFolder}`)) {
-          fs.copyFile(`${rootPath}/${file}/${fileInFolder}`, `${renamePath}/${file}/${fileInFolder}`, (err) => {
-            if (err) {
-              console.error('Error copy', err);
-            } else {
-              console.log('Copy done');
+          fs.copyFile(
+            `${rootPath}/${file}/${fileInFolder}`,
+            `${renamePath}/${file}/${fileInFolder}`,
+            (err) => {
+              if (err) {
+                console.error('Error copy', err);
+              } else {
+                console.log('Copy done');
+              }
             }
-          });
+          );
         }
-      })
-
+      });
     });
     //rename files
-    const filesRename = fs.readdirSync(renamePath)
-    filesRename.forEach(file => {
-      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`)
-      filesInFolder.forEach(fileInFolder => {
-        const newFilePath = path.join(path.dirname(`${renamePath}/${file}/${fileInFolder}`), path.basename(`${renamePath}/${file}/${fileInFolder}`, path.extname(`${renamePath}/${file}/${fileInFolder}`)) + newExtension);
-        fs.rename(`${renamePath}/${file}/${fileInFolder}`, newFilePath, (err) => {
+    const filesRename = fs.readdirSync(renamePath);
+    filesRename.forEach((file) => {
+      const filesInFolder = fs.readdirSync(`${rootPath}/${file}`);
+      filesInFolder.forEach((fileInFolder) => {
+        const filePath = `${renamePath}/${file}/${fileInFolder}`;
+        fs.rename(filePath, filePath.slice(0, filePath.length - 4), (err) => {
           if (err) {
             console.error('Rename error');
           } else {
             console.log('Rename succeeded');
           }
         });
-      })
+      });
     });
   };
 
   handleCreateFolder('ZipData');
   handleCreateFolder('RenameData');
 
-  ipcMain.on('unzip', () => {
-    handleUnzip();
+  const deleteFolderRecursive = function (folderPath: string) {
+    if (fs.existsSync(folderPath)) {
+      fs.readdirSync(folderPath).forEach(function (file, index) {
+        const curPath = folderPath + '/' + file;
+        if (fs.lstatSync(curPath).isDirectory()) {
+          // Nếu là thư mục, gọi đệ quy để xóa tất cả các tệp tin và thư mục con
+          deleteFolderRecursive(curPath);
+        } else {
+          // Nếu là tệp tin, xóa tệp tin
+          fs.unlinkSync(curPath);
+        }
+      });
+      // Xóa thư mục chính
+      fs.rmdirSync(folderPath);
+      console.log('Folder deleted:', folderPath);
+    }
+  };
+
+  ipcMain.on('switchOffline', (event, mode) => {
+    if (isModeOffline(mode)) {
+      handleCreateFolder('RenameData');
+      handleRenameModeOffline();
+    } else {
+      deleteFolderRecursive(`RenameData`);
+    }
   });
 
-  ipcMain.on('switchOffline', () => {
-    handleRename();
-  });
-
-
-  ipcMain.on('download-file', async (event, {downloadUrl, fileName}) => {
+  ipcMain.on('download-file', async (event, { downloadUrl, fileName }) => {
     // Use electron-dl to download the file
     const win = BrowserWindow.getFocusedWindow();
-    const filesRoot = fs.readdirSync('ZipData')
-    console.log("🚀 ~ ipcMain.on ~ filesRoot:", filesRoot)
+    const filesRoot = fs.realpathSync('ZipData');
 
     try {
       const options = {
-        directory: filesRoot[0], // Thay đổi đường dẫn lưu trữ ở đây
+        directory: filesRoot, // Thay đổi đường dẫn lưu trữ ở đây
         filename: fileName,
       };
-      // const downloadItem = await dl.download.then((module) => module.download(win, downloadUrl, options));
       const downloadItem = await dl.download(win, downloadUrl, options);
-      console.log("🚀 ~ ipcMain.on ~ downloadItem:", downloadItem)
-      // const downloadItem = await dl.download(win, downloadUrl, options);
       const savePath = downloadItem.getSavePath();
-      console.log("🚀 ~ ipcMain.on ~ savePath:", savePath)
-      console.log('Tệp đã được tải xuống tới:', savePath);
+      console.log('🚀 ~ ipcMain.on ~ savePath:', savePath);
+      handleUnzip();
     } catch (error) {
-      console.log("🚀 ~ ipcMain.on ~ error:", error)
+      console.log('🚀 ~ ipcMain.on ~ error:', error);
     }
   });
 
@@ -234,7 +278,6 @@ try {
       createWindow();
     }
   });
-
 } catch (e) {
   // Catch Error
   // throw e;
