@@ -7,7 +7,7 @@ import {PanelModule} from "primeng/panel";
 import {ButtonModule} from "primeng/button";
 
 import * as dayjs from "dayjs";
-import {jwtDecode, JwtPayload} from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 import {TokenService} from "../../service";
 import {IToken} from "../../interface/token/token";

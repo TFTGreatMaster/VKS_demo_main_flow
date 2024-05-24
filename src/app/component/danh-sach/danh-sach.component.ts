@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {Router} from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-import { PanelModule } from 'primeng/panel';
-import { RippleModule } from 'primeng/ripple';
-import { TableModule } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {PanelModule} from 'primeng/panel';
+import {RippleModule} from 'primeng/ripple';
+import {TableModule} from 'primeng/table';
+import {TooltipModule} from 'primeng/tooltip';
+import {DialogModule} from 'primeng/dialog';
+import {InputTextModule} from 'primeng/inputtext';
 
 import {IVuAn} from "../../interface/vu-an/vu-an";
 import {VuAnService} from '../../service'
@@ -18,10 +18,6 @@ import {MainService} from "../../service/main/main.service";
 import {isModeOffline} from "../../util/common";
 import {MODE_PROJECT} from "../../interface/main/main";
 import {NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
-import { IVuAn } from '../../interface/vu-an/vu-an';
-import { VuAnService } from '../../service';
-import { DetailVuAnService } from '../../service/detail-vu-an/detail-vu-an.service';
-import { DOMAIN, mockListVuAn } from '../../util/constant';
 
 @Component({
   selector: 'app-danh-sach',
@@ -52,7 +48,7 @@ export class DanhSachComponent implements OnInit {
   visibleUpdateModal: boolean = false;
   visibleDeleteModal: boolean = false;
 
-  createVuAn: Omit<IVuAn, 'id'> = { name: '', description: '' };
+  createVuAn: Omit<IVuAn, 'id'> = {name: '', description: ''};
 
   updateVuAn: IVuAn = {
     id: 0,
@@ -115,16 +111,6 @@ export class DanhSachComponent implements OnInit {
     void this.router.navigate(['/detail-vu-an']);
   }
 
-  constructor(
-    private vuAnService: VuAnService,
-    private router: Router,
-    private detailVuAnService: DetailVuAnService
-  ) {}
-
-  ngOnInit() {
-    this.handleGetAllVuAn();
-  }
-
   handleGetAllVuAn() {
     this.vuAnService.apiGetAllVuAn().subscribe((res: IVuAn[]) => {
       this.vuAn = res;
@@ -154,7 +140,8 @@ export class DanhSachComponent implements OnInit {
 
   onDownLoadVuAn(vuAn: IVuAn) {
     this.vuAnService.apiDownloadVuAn(vuAn.id).subscribe((res) => {
-      console.log('res', res);
+      const listVuAn = [res]
+      localStorage.setItem('list-vu-an', JSON.stringify(listVuAn))
       window.require('electron').ipcRenderer.send('download-file', {
         downloadUrl: `${DOMAIN}/document/download-zip/${vuAn.id}`,
         fileName: `${res.id}.zip`,

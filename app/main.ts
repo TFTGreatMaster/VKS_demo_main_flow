@@ -67,7 +67,7 @@ function createWindow(): BrowserWindow {
     console.log(`Kết quả từ tệp tin .bat: ${stdout}`);
   });
 
-  const handleCreateFolder = (name: string) => {
+  const handleCreateFolder =  (name: string) => {
     if (!fs.existsSync(name)) {
       try {
         fs.mkdirSync(name);
